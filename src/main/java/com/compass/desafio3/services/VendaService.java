@@ -2,6 +2,9 @@ package com.compass.desafio3.services;
 
 import com.compass.desafio3.domain.ItemVenda;
 import com.compass.desafio3.domain.Venda;
+import com.compass.desafio3.exceptions.EstoqueInsuficienteException;
+import com.compass.desafio3.exceptions.ProdutoNotFoundException;
+import com.compass.desafio3.exceptions.VendaNotFoundException;
 import com.compass.desafio3.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,20 +29,23 @@ public class VendaService {
     @Transactional
     public Venda criarVenda(Venda venda) {
         if (venda.getItens().isEmpty()) {
-            throw new RuntimeException("Uma venda deve ter pelo menos um produto.");
+            throw new IllegalArgumentException("Uma venda deve ter pelo menos um produto.");
         }
 
         venda.getItens().forEach(item -> {
             produtoService.obterProduto(item.getProduto().getId())
-                    .ifPresent(produto -> {
+                    .ifPresentOrElse(produto -> {
                         if (produto.getEstoque() < item.getQuantidade()) {
-                            throw new RuntimeException("Estoque insuficiente para o produto: " + produto.getNome());
+                            throw new EstoqueInsuficienteException("Estoque insuficiente para o produto: " + produto.getNome());
                         }
                         produto.setEstoque(produto.getEstoque() - item.getQuantidade());
                         produtoService.atualizarProduto(produto.getId(), produto);
                         item.setPrecoUnitario(produto.getPreco());
+                    }, () -> {
+                        throw new ProdutoNotFoundException("Produto não encontrado com id: " + item.getProduto().getId());
                     });
         });
+
         venda.setDataVenda(LocalDateTime.now());
         return vendaRepository.save(venda);
     }
@@ -52,6 +58,9 @@ public class VendaService {
 
     public Optional<Venda> obterVenda(Long id) {
         Optional<Venda> optionalVenda = vendaRepository.findById(id);
+        if (optionalVenda.isEmpty()) {
+            throw new VendaNotFoundException("Venda não encontrada com id: " + id);
+        }
         optionalVenda.ifPresent(Venda::calcularTotal);
         return optionalVenda;
     }
@@ -60,15 +69,16 @@ public class VendaService {
     public Venda atualizarVenda(Long id, Venda venda) {
         return vendaRepository.findById(id).map(v -> {
             if (venda.getItens().isEmpty()) {
-                throw new RuntimeException("Uma venda deve ter pelo menos um produto.");
+                throw new IllegalArgumentException("Uma venda deve ter pelo menos um produto.");
             }
             v.setItens(venda.getItens());
             return vendaRepository.save(v);
-        }).orElseThrow(() -> new RuntimeException("Venda não encontrada"));
+        }).orElseThrow(() -> new VendaNotFoundException("Venda não encontrada com id: " + id));
     }
 
     @Transactional
     public void excluirVenda(Long id) {
+        vendaRepository.findById(id).orElseThrow(() -> new VendaNotFoundException("Venda não encontrada com id: " + id));
         vendaRepository.deleteById(id);
     }
 

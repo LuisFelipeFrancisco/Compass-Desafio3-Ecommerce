@@ -79,4 +79,5 @@ public class Produto {
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
+
 }

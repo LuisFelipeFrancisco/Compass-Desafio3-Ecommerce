@@ -3,6 +3,8 @@ package com.compass.desafio3.controllers;
 import com.compass.desafio3.domain.Produto;
 import com.compass.desafio3.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,28 +18,33 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @PostMapping
-    public Produto postProduto(@RequestBody Produto produto) {
-        return produtoService.criarProduto(produto);
+    public ResponseEntity<Produto> postProduto(@RequestBody Produto produto) {
+        Produto novoProduto = produtoService.criarProduto(produto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto);
     }
 
     @GetMapping
-    public List<Produto> getProdutos() {
-        return produtoService.listarProdutos();
+    public ResponseEntity<List<Produto>> getProdutos() {
+        List<Produto> produtos = produtoService.listarProdutos();
+        return ResponseEntity.ok(produtos);
     }
 
     @GetMapping("/{id}")
-    public Optional<Produto> getProdutoById(@PathVariable Long id) {
-        return produtoService.obterProduto(id);
+    public ResponseEntity<Optional<Produto>> getProdutoById(@PathVariable Long id) {
+        Optional<Produto> produto = produtoService.obterProduto(id);
+        return ResponseEntity.ok(produto);
     }
 
     @PutMapping("/{id}")
-    public Produto updateProduto(@PathVariable Long id, @RequestBody Produto produto) {
-        return produtoService.atualizarProduto(id, produto);
+    public ResponseEntity<Produto> updateProduto(@PathVariable Long id, @RequestBody Produto produto) {
+        Produto produtoAtualizado = produtoService.atualizarProduto(id, produto);
+        return ResponseEntity.ok(produtoAtualizado);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduto(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
         produtoService.excluirProduto(id);
+        return ResponseEntity.ok().build();
     }
 
 }

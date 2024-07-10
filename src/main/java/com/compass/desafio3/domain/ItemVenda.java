@@ -47,4 +47,5 @@ public class ItemVenda {
     public void setPrecoUnitario(double precoUnitario) {
         this.precoUnitario = precoUnitario;
     }
+
 }

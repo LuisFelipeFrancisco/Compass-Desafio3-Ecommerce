@@ -4,6 +4,7 @@ import com.compass.desafio3.domain.Venda;
 import com.compass.desafio3.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,36 +21,44 @@ public class VendaController {
     private VendaService vendaService;
 
     @PostMapping
-    public Venda criarVenda(@RequestBody Venda venda) {
-        return vendaService.criarVenda(venda);
+    public ResponseEntity<Venda> criarVenda(@RequestBody Venda venda) {
+        Venda novaVenda = vendaService.criarVenda(venda);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novaVenda);
     }
 
     @GetMapping
-    public List<Venda> listarVendas() {
-        return vendaService.listarVendas();
+    public ResponseEntity<List<Venda>> listarVendas() {
+        List<Venda> vendas = vendaService.listarVendas();
+        return ResponseEntity.ok(vendas);
     }
 
     @GetMapping("/{id}")
-    public Optional<Venda> obterVenda(@PathVariable Long id) {
-        return vendaService.obterVenda(id);
+    public ResponseEntity<Optional<Venda>> obterVenda(@PathVariable Long id) {
+        Optional<Venda> venda = vendaService.obterVenda(id);
+        return ResponseEntity.ok(venda);
     }
 
     @PutMapping("/{id}")
-    public Venda atualizarVenda(@PathVariable Long id, @RequestBody Venda venda) {
-        return vendaService.atualizarVenda(id, venda);
+    public ResponseEntity<Venda> atualizarVenda(@PathVariable Long id, @RequestBody Venda venda) {
+        Venda vendaAtualizada = vendaService.atualizarVenda(id, venda);
+        return ResponseEntity.ok(vendaAtualizada);
     }
 
     @DeleteMapping("/{id}")
-    public void excluirVenda(@PathVariable Long id) {
+    public ResponseEntity<Void> excluirVenda(@PathVariable Long id) {
         vendaService.excluirVenda(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/filtrar")
-    public List<Venda> filtrarVendasPorData(@RequestParam LocalDateTime inicio, @RequestParam LocalDateTime fim) {
+    @ResponseStatus(HttpStatus.OK)
+    public List<Venda> filtrarVendasPorData(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
         return vendaService.filtrarVendasPorData(inicio, fim);
     }
 
     @GetMapping("/relatorio/mensal")
+    @ResponseStatus(HttpStatus.OK)
     public List<Venda> relatorioMensal(@RequestParam int ano, @RequestParam int mes) {
         return vendaService.relatorioMensal(ano, mes);
     }
