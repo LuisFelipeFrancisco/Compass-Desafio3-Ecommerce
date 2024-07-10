@@ -3,8 +3,11 @@ package com.compass.desafio3.controllers;
 import com.compass.desafio3.domain.Venda;
 import com.compass.desafio3.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -52,8 +55,12 @@ public class VendaController {
     }
 
     @GetMapping("/relatorio/semanal")
-    public List<Venda> relatorioSemanal(@RequestParam int ano, @RequestParam int semana) {
-        return vendaService.relatorioSemanal(ano, semana);
+    public ResponseEntity<List<Venda>> relatorioSemanal(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial) {
+
+        List<Venda> relatorio = vendaService.relatorioSemanal(dataInicial);
+
+        return ResponseEntity.ok(relatorio);
     }
 
 }

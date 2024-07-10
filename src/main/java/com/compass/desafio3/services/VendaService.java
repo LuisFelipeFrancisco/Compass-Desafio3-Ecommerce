@@ -1,11 +1,13 @@
 package com.compass.desafio3.services;
 
+import com.compass.desafio3.domain.ItemVenda;
 import com.compass.desafio3.domain.Venda;
 import com.compass.desafio3.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.List;
@@ -43,11 +45,15 @@ public class VendaService {
     }
 
     public List<Venda> listarVendas() {
-        return vendaRepository.findAll();
+        List<Venda> vendas = vendaRepository.findAll();
+        vendas.forEach(Venda::calcularTotal);
+        return vendas;
     }
 
     public Optional<Venda> obterVenda(Long id) {
-        return vendaRepository.findById(id);
+        Optional<Venda> optionalVenda = vendaRepository.findById(id);
+        optionalVenda.ifPresent(Venda::calcularTotal);
+        return optionalVenda;
     }
 
     @Transactional
@@ -67,20 +73,47 @@ public class VendaService {
     }
 
     public List<Venda> filtrarVendasPorData(LocalDateTime inicio, LocalDateTime fim) {
-        return vendaRepository.findAllByDataVendaBetween(inicio, fim);
+        List<Venda> vendas = vendaRepository.findAllByDataVendaBetween(inicio, fim);
+        calcularTotais(vendas);
+        return vendas;
     }
 
     public List<Venda> relatorioMensal(int ano, int mes) {
         LocalDateTime inicio = LocalDateTime.of(ano, mes, 1, 0, 0);
         LocalDateTime fim = inicio.plusMonths(1).minusSeconds(1);
-        return vendaRepository.findAllByDataVendaBetween(inicio, fim);
+
+        List<Venda> vendas = vendaRepository.findAllByDataVendaBetween(inicio, fim);
+        calcularTotais(vendas);
+        return vendas;
     }
 
-    public List<Venda> relatorioSemanal(int ano, int semana) {
+    public List<Venda> relatorioSemanal(LocalDate dataInicial) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime inicio = LocalDateTime.now().withYear(ano).with(weekFields.weekOfYear(), semana).with(weekFields.dayOfWeek(), 1);
-        LocalDateTime fim = inicio.plusDays(6).withHour(23).withMinute(59).withSecond(59);
-        return vendaRepository.findAllByDataVendaBetween(inicio, fim);
+        int ano = dataInicial.getYear();
+        int semana = dataInicial.get(weekFields.weekOfWeekBasedYear());
+
+        LocalDateTime inicio = dataInicial.atStartOfDay()
+                .with(weekFields.weekOfWeekBasedYear(), semana)
+                .with(weekFields.dayOfWeek(), 1);
+
+        LocalDateTime fim = inicio.plusDays(6)
+                .withHour(23)
+                .withMinute(59)
+                .withSecond(59);
+
+        List<Venda> vendas = vendaRepository.findAllByDataVendaBetween(inicio, fim);
+        calcularTotais(vendas);
+        return vendas;
+    }
+
+    private void calcularTotais(List<Venda> vendas) {
+        for (Venda venda : vendas) {
+            double novoTotal = 0.0;
+            for (ItemVenda item : venda.getItens()) {
+                novoTotal += item.getQuantidade() * item.getPrecoUnitario();
+            }
+            venda.setTotal(novoTotal);
+        }
     }
 
 }
