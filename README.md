@@ -37,7 +37,7 @@ Este projeto é uma API para um sistema de e-commerce, desenvolvida utilizando J
 - Spring Boot 3.3.1
 - MySQL
 - JPA-Hibernate
-- Spring Cache
+- Caffeine Cache
 
 ## Arquitetura
 
