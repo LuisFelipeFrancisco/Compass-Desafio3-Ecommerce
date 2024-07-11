@@ -1,6 +1,7 @@
 package com.compass.desafio3.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,7 +17,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 ex.getMessage()
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
     @ExceptionHandler(EstoqueInsuficienteException.class)
@@ -26,7 +29,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 ex.getMessage()
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
     @ExceptionHandler(VendaNotFoundException.class)
@@ -36,7 +41,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 ex.getMessage()
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -51,7 +58,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 messages.toString()
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
@@ -61,7 +70,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 ex.getMessage()
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
 }

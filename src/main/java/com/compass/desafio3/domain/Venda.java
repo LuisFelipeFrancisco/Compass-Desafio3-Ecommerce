@@ -22,7 +22,7 @@ public class Venda {
     private LocalDateTime dataVenda;
 
     @Transient
-    private double total; // Atributo transient que não será persistido no banco de dados TODO
+    private double total; // Atributo transient que não será persistido no banco de dados
 
     public Long getId() {
         return id;

@@ -7,6 +7,8 @@ import com.compass.desafio3.exceptions.ProdutoNotFoundException;
 import com.compass.desafio3.exceptions.VendaNotFoundException;
 import com.compass.desafio3.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,12 +52,14 @@ public class VendaService {
         return vendaRepository.save(venda);
     }
 
+    @Cacheable("vendas")
     public List<Venda> listarVendas() {
         List<Venda> vendas = vendaRepository.findAll();
         vendas.forEach(Venda::calcularTotal);
         return vendas;
     }
 
+    @Cacheable(value = "venda", key = "#id")
     public Optional<Venda> obterVenda(Long id) {
         Optional<Venda> optionalVenda = vendaRepository.findById(id);
         if (optionalVenda.isEmpty()) {
@@ -66,6 +70,7 @@ public class VendaService {
     }
 
     @Transactional
+    @CacheEvict(value = "venda", key = "#id")
     public Venda atualizarVenda(Long id, Venda venda) {
         return vendaRepository.findById(id).map(v -> {
             if (venda.getItens().isEmpty()) {
@@ -77,6 +82,7 @@ public class VendaService {
     }
 
     @Transactional
+    @CacheEvict(value = "venda", key = "#id")
     public void excluirVenda(Long id) {
         vendaRepository.findById(id).orElseThrow(() -> new VendaNotFoundException("Venda não encontrada com id: " + id));
         vendaRepository.deleteById(id);
@@ -99,7 +105,6 @@ public class VendaService {
 
     public List<Venda> relatorioSemanal(LocalDate dataInicial) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        int ano = dataInicial.getYear();
         int semana = dataInicial.get(weekFields.weekOfWeekBasedYear());
 
         LocalDateTime inicio = dataInicial.atStartOfDay()

@@ -4,6 +4,9 @@ import com.compass.desafio3.domain.Produto;
 import com.compass.desafio3.exceptions.ProdutoNotFoundException;
 import com.compass.desafio3.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +18,12 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Cacheable("produtos")
     public List<Produto> listarProdutos() {
         return produtoRepository.findAllByAtivoTrue();
     }
 
+    @Cacheable(value = "produto", key = "#id")
     public Optional<Produto> obterProduto(Long id) {
         Optional<Produto> optionalProduto = produtoRepository.findById(id);
         if (optionalProduto.isEmpty()) {
@@ -27,10 +32,12 @@ public class ProdutoService {
         return optionalProduto;
     }
 
+    @CachePut(value = "produto", key = "#produto.id")
     public Produto criarProduto(Produto produto) {
         return produtoRepository.save(produto);
     }
 
+    @CachePut(value = "produto", key = "#id")
     public Produto atualizarProduto(Long id, Produto produto) {
         return produtoRepository.findById(id).map(p -> {
             p.setNome(produto.getNome());
@@ -41,6 +48,7 @@ public class ProdutoService {
         }).orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado com id: " + id));
     }
 
+    @CacheEvict(value = "produto", key = "#id")
     public void excluirProduto(Long id) {
         produtoRepository.findById(id).ifPresentOrElse(produto -> {
             if (produto.getEstoque() == 0) {
