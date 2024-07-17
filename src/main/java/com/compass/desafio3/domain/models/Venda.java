@@ -21,6 +21,10 @@ public class Venda {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", shape = JsonFormat.Shape.STRING)
     private LocalDateTime dataVenda;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     @Transient
     private double total; // Atributo transient que não será persistido no banco de dados
 
