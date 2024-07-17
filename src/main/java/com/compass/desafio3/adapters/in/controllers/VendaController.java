@@ -1,7 +1,7 @@
-package com.compass.desafio3.controllers;
+package com.compass.desafio3.adapters.in.controllers;
 
-import com.compass.desafio3.domain.Venda;
-import com.compass.desafio3.services.VendaService;
+import com.compass.desafio3.domain.models.Venda;
+import com.compass.desafio3.application.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

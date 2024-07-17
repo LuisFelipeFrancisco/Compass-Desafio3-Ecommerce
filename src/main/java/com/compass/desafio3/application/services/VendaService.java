@@ -1,11 +1,11 @@
-package com.compass.desafio3.services;
+package com.compass.desafio3.application.services;
 
-import com.compass.desafio3.domain.ItemVenda;
-import com.compass.desafio3.domain.Venda;
-import com.compass.desafio3.exceptions.EstoqueInsuficienteException;
-import com.compass.desafio3.exceptions.ProdutoNotFoundException;
-import com.compass.desafio3.exceptions.VendaNotFoundException;
-import com.compass.desafio3.repositories.VendaRepository;
+import com.compass.desafio3.domain.models.ItemVenda;
+import com.compass.desafio3.domain.models.Venda;
+import com.compass.desafio3.application.exceptions.EstoqueInsuficienteException;
+import com.compass.desafio3.application.exceptions.ProdutoNotFoundException;
+import com.compass.desafio3.application.exceptions.VendaNotFoundException;
+import com.compass.desafio3.adapters.out.persistence.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

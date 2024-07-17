@@ -1,8 +1,9 @@
-package com.compass.desafio3.services;
+package com.compass.desafio3.application.services;
 
-import com.compass.desafio3.domain.Produto;
-import com.compass.desafio3.exceptions.ProdutoNotFoundException;
-import com.compass.desafio3.repositories.ProdutoRepository;
+import com.compass.desafio3.domain.models.Produto;
+import com.compass.desafio3.application.exceptions.ProdutoNotFoundException;
+import com.compass.desafio3.adapters.out.persistence.ProdutoRepository;
+import com.compass.desafio3.adapters.out.persistence.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -17,6 +18,9 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private VendaRepository vendaRepository;
 
     @Cacheable("produtos")
     public List<Produto> listarProdutos() {
@@ -51,11 +55,11 @@ public class ProdutoService {
     @CacheEvict(value = "produto", key = "#id")
     public void excluirProduto(Long id) {
         produtoRepository.findById(id).ifPresentOrElse(produto -> {
-            if (produto.getEstoque() == 0) {
-                produtoRepository.delete(produto);
-            } else {
+            if (vendaRepository.existsByProdutoId(id)) {
                 produto.setAtivo(false);
                 produtoRepository.save(produto);
+            } else {
+                produtoRepository.delete(produto);
             }
         }, () -> {
             throw new ProdutoNotFoundException("Produto não encontrado com id: " + id);

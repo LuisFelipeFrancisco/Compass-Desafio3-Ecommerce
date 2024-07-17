@@ -1,4 +1,4 @@
-package com.compass.desafio3.exceptions;
+package com.compass.desafio3.application.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

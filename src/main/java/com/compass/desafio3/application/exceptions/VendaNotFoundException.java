@@ -1,4 +1,4 @@
-package com.compass.desafio3.exceptions;
+package com.compass.desafio3.application.exceptions;
 
 public class VendaNotFoundException extends RuntimeException {
 
