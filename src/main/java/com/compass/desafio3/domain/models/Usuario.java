@@ -1,6 +1,7 @@
 package com.compass.desafio3.domain.models;
 
 import com.compass.desafio3.domain.models.enums.Funcao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class Usuario implements UserDetails {
     private Funcao funcao;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private Set<Venda> vendas;
 
     private String tokenResetSenha; // Novo campo para armazenar o token de reset de senha

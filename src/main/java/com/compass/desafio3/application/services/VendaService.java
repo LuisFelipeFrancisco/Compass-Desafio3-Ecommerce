@@ -1,6 +1,9 @@
 package com.compass.desafio3.application.services;
 
+import com.compass.desafio3.application.exceptions.UsuarioNotFoundException;
 import com.compass.desafio3.domain.models.ItemVenda;
+import com.compass.desafio3.domain.models.Produto;
+import com.compass.desafio3.domain.models.Usuario;
 import com.compass.desafio3.domain.models.Venda;
 import com.compass.desafio3.application.exceptions.EstoqueInsuficienteException;
 import com.compass.desafio3.application.exceptions.ProdutoNotFoundException;
@@ -28,6 +31,9 @@ public class VendaService {
     @Autowired
     private ProdutoService produtoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     @Transactional
     public Venda criarVenda(Venda venda) {
         if (venda.getItens().isEmpty()) {
@@ -35,20 +41,17 @@ public class VendaService {
         }
 
         venda.getItens().forEach(item -> {
-            produtoService.obterProduto(item.getProduto().getId())
-                    .ifPresentOrElse(produto -> {
-                        if (produto.getEstoque() < item.getQuantidade()) {
-                            throw new EstoqueInsuficienteException("Estoque insuficiente para o produto: " + produto.getNome());
-                        }
-                        produto.setEstoque(produto.getEstoque() - item.getQuantidade());
-                        produtoService.atualizarProduto(produto.getId(), produto);
-                        item.setPrecoUnitario(produto.getPreco());
-                    }, () -> {
-                        throw new ProdutoNotFoundException("Produto não encontrado com id: " + item.getProduto().getId());
-                    });
+            Produto produto = produtoService.obterProduto(item.getProduto().getId())
+                    .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado com id: " + item.getProduto().getId()));
+            item.setProduto(produto);
+            item.setPrecoUnitario(produto.getPreco());
         });
 
+        Usuario usuario = usuarioService.obterUsuario(venda.getUsuario().getId());
+        venda.setUsuario(usuario);
+
         venda.setDataVenda(LocalDateTime.now());
+
         return vendaRepository.save(venda);
     }
 
@@ -76,10 +79,20 @@ public class VendaService {
             if (venda.getItens().isEmpty()) {
                 throw new IllegalArgumentException("Uma venda deve ter pelo menos um produto.");
             }
+
+            // Verifica se o usuário da venda atualizada está corretamente preenchido
+            if (venda.getUsuario() == null) {
+                throw new IllegalArgumentException("Usuário da venda é obrigatório.");
+            }
+
+            // Atualiza os itens da venda e o usuário
             v.setItens(venda.getItens());
+            v.setUsuario(venda.getUsuario());
+
             return vendaRepository.save(v);
         }).orElseThrow(() -> new VendaNotFoundException("Venda não encontrada com id: " + id));
     }
+
 
     @Transactional
     @CacheEvict(value = "venda", key = "#id")

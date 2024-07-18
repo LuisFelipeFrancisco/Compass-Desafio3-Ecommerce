@@ -60,6 +60,14 @@ public class Venda {
         this.total = total;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     // Método para calcular o total da venda com base nos itens atuais
     public void calcularTotal() {
         double novoTotal = 0.0;

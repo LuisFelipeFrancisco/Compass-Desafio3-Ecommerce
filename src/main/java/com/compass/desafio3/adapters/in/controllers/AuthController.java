@@ -7,6 +7,7 @@ import com.compass.desafio3.domain.models.*;
 import com.compass.desafio3.domain.models.dtos.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.sasl.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,24 +36,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthDTO dataAuth) {
+        if (dataAuth.email() == null || dataAuth.email().isEmpty() || dataAuth.senha() == null || dataAuth.senha().isEmpty()) {
+            throw new IllegalArgumentException("Email e senha são obrigatórios.");
+        }
+
         var usuarioSenha = new UsernamePasswordAuthenticationToken(dataAuth.email(), dataAuth.senha());
         var auth = this.authManager.authenticate(usuarioSenha);
         var token = tokenService.gerarToken((Usuario) auth.getPrincipal());
-
         return ResponseEntity.ok(new LoginDTO(token));
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity registrar(@RequestBody @Valid RegDTO dataReg) {
-        if (this.userRepository.findByEmail(dataReg.email()) != null) return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> registrar(@RequestBody @Valid RegDTO dataReg) {
+        if (this.userRepository.findByEmail(dataReg.email()) != null) {
+            return ResponseEntity.badRequest().body("Email já registrado.");
+        }
 
         String encodedPassword = new BCryptPasswordEncoder().encode(dataReg.senha());
         Usuario novoUsuario = new Usuario(dataReg.nome(), dataReg.email(), encodedPassword, dataReg.funcao());
 
         this.userRepository.save(novoUsuario);
 
-        return ResponseEntity.ok().build();
-
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso.");
     }
 
     @PostMapping("/solicitar-reset-senha")
