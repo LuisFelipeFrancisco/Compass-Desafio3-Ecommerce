@@ -4,6 +4,7 @@ import com.compass.desafio3.adapters.out.persistence.UsuarioRepository;
 import com.compass.desafio3.application.services.EmailService;
 import com.compass.desafio3.config.security.TokenService;
 import com.compass.desafio3.domain.models.*;
+import com.compass.desafio3.domain.models.dtos.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

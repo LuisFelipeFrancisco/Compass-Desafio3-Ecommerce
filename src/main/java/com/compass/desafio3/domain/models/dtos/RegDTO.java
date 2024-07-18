@@ -1,4 +1,4 @@
-package com.compass.desafio3.domain.models;
+package com.compass.desafio3.domain.models.dtos;
 
 import com.compass.desafio3.domain.models.enums.Funcao;
 
