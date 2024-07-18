@@ -43,4 +43,5 @@ public class AuthFilter extends OncePerRequestFilter {
 
         return token.substring(7, token.length());
     }
+
 }

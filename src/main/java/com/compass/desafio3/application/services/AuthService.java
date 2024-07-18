@@ -12,7 +12,7 @@ public class AuthService implements UserDetailsService {
 
 
     @Autowired
-    UsuarioRepository userRepository;
+    private UsuarioRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

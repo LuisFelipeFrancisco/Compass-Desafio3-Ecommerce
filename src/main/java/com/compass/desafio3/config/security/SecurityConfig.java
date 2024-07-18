@@ -27,6 +27,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        //.requestMatchers(HttpMethod.GET).permitAll() // TODO apagar isso apenas testes
+                        .requestMatchers(HttpMethod.POST, "/auth/solicitar-reset-senha").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/resetar-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/produtos").hasRole("ADMIN")

@@ -17,3 +17,17 @@ spring:
     security:
       token:
         secret: ${JWT_SECRET:my-secret}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_GMAIL}
+    password: heep krnw ghzl qjtb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com

@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,10 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario")
     private Set<Venda> vendas;
+
+    private String tokenResetSenha; // Novo campo para armazenar o token de reset de senha
+
+    private LocalDateTime tokenExpiraEm; // Novo campo para armazenar a data de expiração do token
 
     public Usuario(String nome, String email, String encodedPassword, Funcao funcao) {
         this.nome = nome;
@@ -92,6 +97,22 @@ public class Usuario implements UserDetails {
 
     public void setVendas(Set<Venda> vendas) {
         this.vendas = vendas;
+    }
+
+    public String getTokenResetSenha() {
+        return tokenResetSenha;
+    }
+
+    public void setTokenResetSenha(String tokenResetSenha) {
+        this.tokenResetSenha = tokenResetSenha;
+    }
+
+    public LocalDateTime getTokenExpiraEm() {
+        return tokenExpiraEm;
+    }
+
+    public void setTokenExpiraEm(LocalDateTime tokenExpiraEm) {
+        this.tokenExpiraEm = tokenExpiraEm;
     }
 
     @Override
