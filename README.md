@@ -1,35 +1,54 @@
 # Compass-Desafio3-Ecommerce-API
 
-Este projeto é uma API para um sistema de e-commerce, desenvolvida utilizando Java 17 e Spring Boot 3.3.1. A API permite gerenciar produtos e vendas, oferecendo funcionalidades como criação, leitura, atualização e exclusão de produtos e vendas, além de relatórios e controle de estoque.
+Este projeto é uma API para um sistema de e-commerce desenvolvido com Java 17 e Spring Boot 3.3.1. A aplicação oferece funcionalidades avançadas para gerenciar produtos, vendas, autenticação JWT e integração com banco de dados MySQL via JPA-Hibernate. A arquitetura segue os princípios da Clean Architecture, visando alta coesão e baixo acoplamento.
+
+---
 
 ## Funcionalidades
 
 ### Produto
 
-- Permitir que os usuários criem, leiam, atualizem e excluam produtos.
-- Validar os dados de entrada na criação de um produto (e.g., preço positivo).
-- Impedir a exclusão de produtos que já foram incluídos em uma venda, mas permitir a inativação.
-- Controlar o estoque dos produtos para impedir vendas com quantidade insuficiente.
+- Operações CRUD para produtos.
+- Validação de dados na criação de produtos (e.g., preço positivo).
+- Inativação de produtos ao invés de exclusão para produtos vinculados a vendas.
+- Controle de estoque para evitar vendas com estoque insuficiente.
 
 ### Vendas
 
-- Permitir que os usuários criem, leiam, atualizem e excluam vendas (uma venda deve conter no mínimo 1 produto).
-- Filtrar vendas por data.
-- Gerar relatórios de vendas mensais e semanais.
+- Operações CRUD para vendas, com pelo menos um produto por venda.
+- Filtro de vendas por data.
+- Relatórios de vendas mensais e semanais.
 
 ### Cache
 
-- Utilizar o cache nativo do Spring para otimizar leituras.
-- Gerenciar o cache de vendas para garantir a atualização dos dados.
+- Utilização de cache para otimização de leituras.
+- Gerenciamento de cache para manter os dados atualizados.
 
 ### Tratamento de Exceções
 
-- Tratar todas as exceções de forma padronizada, com respostas consistentes.
+- Tratamento padronizado de exceções com respostas consistentes.
 
-### Regras de Negócio Gerais
+---
 
-- Todas as datas seguem o padrão ISO 8601.
-- Campos de data são definidos automaticamente.
+## Regras de Negócio - Geral
+
+- Campos de data no formato ISO 8601 (`yyyy-MM-dd'T'HH:mm:ss'Z'`).
+- Campos de data definidos automaticamente.
+
+---
+
+## Autenticação e Autorização
+
+- Autenticação via Token JWT.
+- Autorização baseada em roles.
+
+---
+
+## Reset de Senha
+
+- Implementação de método para resetar senha, com geração de token único enviado por e-mail.
+
+---
 
 ## Tecnologias Utilizadas
 
@@ -38,11 +57,18 @@ Este projeto é uma API para um sistema de e-commerce, desenvolvida utilizando J
 - MySQL
 - JPA-Hibernate
 - Caffeine Cache
+- JWT (JSON Web Token)
+
+---
 
 ## Arquitetura
 
-O projeto segue a Clean Architecture para garantir a separação de responsabilidades e facilitar a manutenção e escalabilidade do código.
+O projeto segue os princípios da Clean Architecture, promovendo separação clara de responsabilidades e facilitando manutenção e escalabilidade.
 
-## Diagrama Entidade-Relacionamento (DER)
+---
 
-![Diagrama ER](https://cdn-0.plantuml.com/plantuml/png/TKz1QWCn3Bpx5UhUzmCbX51o2VHGQDfhKTSY5TXIOik1aitVQxmXzQ7rQMRacP4ssJ1PYS4zs1T5WeWfEn9Z-uRXdSJZ09ZXJ1N1nK5zpoe7O7_34uOj6ksvcZqQDa-RUIsVWS3KCC1gjKyecKbilNPNT-_O6SNV7gxiuxyo5eDJmMhqwAdlE2QQz4tOCB7swIz9VJ5jsSS5_n7yQeah4utKSqzvIZoXDd7RLJLX9qO7Ia3Pz5GMvvDg81H0utDRPBbbdiTHB_rrZp1K9dbmdNWTntc-xrc_tE3WDdLUOlW1)
+## Diagrama ER
+
+![Diagrama ER](https://www.plantuml.com/plantuml/png/dPB1RXGn38RlynJMdA1e3xqZQA4BMed3YhBSJMAcKHDxcZYb2FNT2Pd9xenM0Wbf94y-vxT_9xbAYb5pyDs8vXu7WdwxCH82HKDmlT_ryAi3A1-nElq9-oWsgrGAy0e-2G_WR5rjDZEyrUWAPWcq9fQIYSwWpFX6yZTFC4Oo3UrOQQ08b5GUSjE_4_643AZkKPRD7iLPSFo7Otpnih3dxkJsa396zxzkAQ3pQvI8xt167p8R5FXUmtgRoZtnPqgajqrGknlqDwZqnGMQzcoVHXTn6vQEteltPDG9ltuBzAJ4Di77YAnahxFUIIoZlO61jAqSfJewjFubjyUKVaYqPub3eiWOwEomlX9R_FjHhIUmg5X5SzPEjwcYw9Uw2zWfXQcyK-9KgHnl9qznRQTf_cN9iS93ngAnQ6dXfBsh0pkjvHSoERxZSOgjTyFzPL_sGd_HGvkmna9QucImWzF_Kha_rcwJDlLbAzizTrVb9mV_6m00)
+
+---

@@ -1,7 +1,7 @@
-package com.compass.desafio3.controllers;
+package com.compass.desafio3.adapters.in.controllers;
 
-import com.compass.desafio3.domain.Produto;
-import com.compass.desafio3.services.ProdutoService;
+import com.compass.desafio3.domain.models.Produto;
+import com.compass.desafio3.application.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

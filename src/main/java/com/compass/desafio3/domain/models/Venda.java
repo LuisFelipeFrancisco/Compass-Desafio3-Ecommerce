@@ -1,4 +1,4 @@
-package com.compass.desafio3.domain;
+package com.compass.desafio3.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -20,6 +20,10 @@ public class Venda {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", shape = JsonFormat.Shape.STRING)
     private LocalDateTime dataVenda;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Transient
     private double total; // Atributo transient que não será persistido no banco de dados
@@ -54,6 +58,14 @@ public class Venda {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     // Método para calcular o total da venda com base nos itens atuais
