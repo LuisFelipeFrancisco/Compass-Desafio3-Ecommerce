@@ -35,6 +35,17 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario")
     private Set<Venda> vendas;
 
+    public Usuario(String nome, String email, String encodedPassword, Funcao funcao) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = encodedPassword;
+        this.funcao = funcao;
+    }
+
+    public Usuario() {
+
+    }
+
     public Long getId() {
         return id;
     }
