@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,9 +53,11 @@ public class VendaController {
 
     @GetMapping("/filtrar")
     @ResponseStatus(HttpStatus.OK)
-    public List<Venda> filtrarVendasPorData(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
-        return vendaService.filtrarVendasPorData(inicio, fim);
+    public List<Venda> filtrarVendasPorData(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate inicio,
+                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate fim) {
+        LocalDateTime inicioDateTime = inicio.atStartOfDay();
+        LocalDateTime fimDateTime = fim.atTime(LocalTime.MAX);
+        return vendaService.filtrarVendasPorData(inicioDateTime, fimDateTime);
     }
 
     @GetMapping("/relatorio/mensal")

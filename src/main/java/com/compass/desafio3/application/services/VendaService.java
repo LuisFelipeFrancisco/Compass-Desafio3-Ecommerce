@@ -1,11 +1,10 @@
 package com.compass.desafio3.application.services;
 
-import com.compass.desafio3.application.exceptions.UsuarioNotFoundException;
+import com.compass.desafio3.adapters.out.persistence.ProdutoRepository;
 import com.compass.desafio3.domain.models.ItemVenda;
 import com.compass.desafio3.domain.models.Produto;
 import com.compass.desafio3.domain.models.Usuario;
 import com.compass.desafio3.domain.models.Venda;
-import com.compass.desafio3.application.exceptions.EstoqueInsuficienteException;
 import com.compass.desafio3.application.exceptions.ProdutoNotFoundException;
 import com.compass.desafio3.application.exceptions.VendaNotFoundException;
 import com.compass.desafio3.adapters.out.persistence.VendaRepository;
@@ -18,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class VendaService {
@@ -33,6 +30,8 @@ public class VendaService {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
     @Transactional
     public Venda criarVenda(Venda venda) {
@@ -43,13 +42,19 @@ public class VendaService {
         venda.getItens().forEach(item -> {
             Produto produto = produtoService.obterProduto(item.getProduto().getId())
                     .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado com id: " + item.getProduto().getId()));
+
+            if (produto.getEstoque() < item.getQuantidade()) {
+                throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produto.getNome());
+            }
+
             item.setProduto(produto);
             item.setPrecoUnitario(produto.getPreco());
+
+            produtoService.atualizarEstoque(produto.getId(), produto.getEstoque() - item.getQuantidade());
         });
 
         Usuario usuario = usuarioService.obterUsuario(venda.getUsuario().getId());
         venda.setUsuario(usuario);
-
         venda.setDataVenda(LocalDateTime.now());
 
         return vendaRepository.save(venda);
@@ -80,18 +85,46 @@ public class VendaService {
                 throw new IllegalArgumentException("Uma venda deve ter pelo menos um produto.");
             }
 
-            // Verifica se o usuário da venda atualizada está corretamente preenchido
             if (venda.getUsuario() == null) {
                 throw new IllegalArgumentException("Usuário da venda é obrigatório.");
             }
 
-            // Atualiza os itens da venda e o usuário
-            v.setItens(venda.getItens());
+            for (ItemVenda item : v.getItens()) {
+                Produto produto = item.getProduto();
+                produtoService.atualizarEstoque(produto.getId(), produto.getEstoque() + item.getQuantidade());
+            }
+
+            Set<ItemVenda> itensExistentes = new HashSet<>(v.getItens());
+            Set<ItemVenda> itensNovos = new HashSet<>(venda.getItens());
+
+            itensExistentes.removeAll(itensNovos);
+            v.getItens().removeAll(itensExistentes);
+
+            for (ItemVenda item : itensNovos) {
+                if (!v.getItens().contains(item)) {
+                    Produto produto = produtoService.obterProduto(item.getProduto().getId())
+                            .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado com id: " + item.getProduto().getId()));
+
+                    if (produto.getEstoque() < item.getQuantidade()) {
+                        throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produto.getNome());
+                    }
+
+                    item.setProduto(produto);
+                    item.setPrecoUnitario(produto.getPreco());
+                    v.getItens().add(item);
+
+                    produtoService.atualizarEstoque(produto.getId(), produto.getEstoque() - item.getQuantidade());
+                }
+            }
+
             v.setUsuario(venda.getUsuario());
+
+            v.calcularTotal();
 
             return vendaRepository.save(v);
         }).orElseThrow(() -> new VendaNotFoundException("Venda não encontrada com id: " + id));
     }
+
 
 
     @Transactional

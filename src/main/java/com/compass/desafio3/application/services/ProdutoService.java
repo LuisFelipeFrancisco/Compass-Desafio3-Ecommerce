@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,17 @@ public class ProdutoService {
         }, () -> {
             throw new ProdutoNotFoundException("Produto não encontrado com id: " + id);
         });
+    }
+
+    @Transactional
+    public void atualizarEstoque(Long produtoId, Integer novoEstoque) {
+        produtoRepository.findById(produtoId).map(produto -> {
+            if (novoEstoque < 0) {
+                throw new IllegalArgumentException("O estoque não pode ser negativo.");
+            }
+            produto.setEstoque(novoEstoque);
+            return produtoRepository.save(produto);
+        }).orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado com id: " + produtoId));
     }
 
 }
